@@ -13,6 +13,9 @@ dirMatrix["s","z"]=F
 dirMatrix["d","q"]=F
 dirMatrix["q","d"]=F
 
+#création matrice changement coordonnees
+coor=matrix(c(0,-1,0,1,+1,0,-1,0), byrow=T, nrow=2, dimnames = list(c("x","y"), dirVect))
+
 #entité
 t=xy.coords(0,0)
 tdir='d'
@@ -29,4 +32,12 @@ testDir=function(depart, demande){
     return(demande)
   }
   return(depart)
+}
+
+demande=scan(what=character(0), nmax=1, multi.line = F)
+
+move=function(direction){
+  x=t$x+coor["x",direction]
+  y=t$y+coor["y",direction]
+  return(xy.coords(x,y))
 }
