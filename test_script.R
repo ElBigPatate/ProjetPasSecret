@@ -16,5 +16,4 @@ testMur=function(t){
   return(F)
 }
 
-# Je suis passé par là
-# Et je repasserai par ici !
+
