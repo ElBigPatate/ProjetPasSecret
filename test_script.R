@@ -67,6 +67,20 @@ moveCorps=function(corps, tete){
   return(corps)
 }
 
+#test si la tete entre en colision avec le corps
+#entree : tete corps
+#sortie : booléen
+testCollision=function(tete, corps){
+  for(i in corps){
+    if(i$x==tete$coord$x){
+      if(i$y==tete$coord$y){
+        return(T)
+      }
+    }
+  }
+  return(F)
+}
+
 #--------------------------------------------------------------------------------------------------
 #Initialisation
 #--------------------------------------------------------------------------------------------------
@@ -105,8 +119,14 @@ corps=list(A=xy.coords(-1,0),
 #boucle de test mv
 
 tete=initTete()
+corps=list(A=xy.coords(-1,0), 
+           B=xy.coords(-2,0),
+           C=xy.coords(-3,0),
+           D=xy.coords(-4,0))
 initGrille()
-while (! testMur(tete)){
+while ((! testMur(tete)) & (! testCollision(tete, corps))){
+  #position du corps au prochain tour
+  corps=moveCorps(corps, tete)
   #bouger
   tete$coord=move(tete)
   #afficher point
@@ -119,8 +139,6 @@ while (! testMur(tete)){
   nouvelleDir=sample(dirVect,1)
   #tester direction
   tete$dir=testDir(tete$dir,nouvelleDir)
-  #position du corps au prochain tour
-  corps=moveCorps(corps, tete)
   Sys.sleep(0.3)
   initGrille()
 }
