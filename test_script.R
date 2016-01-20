@@ -8,7 +8,7 @@
 initTete=function(){
   return( list(coord=xy.coords(0,0),
                dir='d') 
-        )
+  )
 }
 
 
@@ -51,6 +51,22 @@ move=function(t){
   return(xy.coords(x,y))
 }
 
+#Déplacement du corps
+#entree : objet corps, objet tete
+#sortie : objet corps
+moveCorps=function(corps, tete){
+  vecCorps=names(corps)
+  invCorps=rev(vecCorps)
+  l=length(invCorps)
+  for(i in 1:(l-1)){
+    # print(paste("Voilà ce que je prend : ", invCorps[i]))
+    # print(paste("ce que je met : ", invCorps[i+1]))
+    corps[[ invCorps[i] ]] = corps[[ invCorps[i+1] ]]
+  }
+  corps[[ vecCorps[1] ]]=tete$coord
+  return(corps)
+}
+
 #--------------------------------------------------------------------------------------------------
 #Initialisation
 #--------------------------------------------------------------------------------------------------
@@ -78,24 +94,33 @@ coor=matrix(c(0,-1,0,1,
 
 #entité tete
 tete=initTete()
-
+corps=list(A=xy.coords(-1,0), 
+           B=xy.coords(-2,0),
+           C=xy.coords(-3,0))
 
 #--------------------------------------------------------------------------------------------------
 #Main
 #--------------------------------------------------------------------------------------------------
 
 #boucle de test mv
-for(i in seq(1,100)){
-  tete=initTete()
-  initGrille()
-  while (! testMur(tete)){
-    #bouger
-    tete$coord=move(tete)
-    #afficher point
-    points(tete$coord)
-    #choisir direction
-    nouvelleDir=sample(dirVect,1)
-    #tester direction
-    tete$dir=testDir(tete$dir,nouvelleDir)
+
+tete=initTete()
+initGrille()
+while (! testMur(tete)){
+  #bouger
+  tete$coord=move(tete)
+  #afficher point
+  points(tete$coord)
+  #afficher corps
+  for(i in corps){
+    points(i, col='red')
   }
+  #choisir direction
+  nouvelleDir=sample(dirVect,1)
+  #tester direction
+  tete$dir=testDir(tete$dir,nouvelleDir)
+  #position du corps au prochain tour
+  corps=moveCorps(corps, tete)
+  Sys.sleep(0.3)
+  initGrille()
 }
