@@ -2,16 +2,6 @@
 #Fonctions
 #--------------------------------------------------------------------------------------------------
 
-#rend une tete en 0.0 allant vers la droite
-#entree : -
-#sortie : objet tete
-initTete=function(){
-  return( list(coord=xy.coords(0,0),
-               dir='d') 
-  )
-}
-
-
 #cree un nouveau plot
 #entree : -
 #sortie : -
@@ -26,7 +16,7 @@ initGrille=function(){
 #entree : objet tete
 #sortie : booléen
 testMur=function(t){
-  if(abs(t$coord$x)>=11 | abs(t$coord$y)>=11){
+  if(abs(t$x)>=11 | abs(t$y)>=11){
     return(T)
   }
   return(F)
@@ -43,42 +33,53 @@ testDir=function(depart, demande){
 }
 
 #calcul nouvelle coordonées de la tete selon la direction
-#entree : tete
+#entree : objet coordonnées, direction
 #sortie : objet coordonnées
-move=function(t){
-  x=t$coord$x+coor["x",t$dir]
-  y=t$coord$y+coor["y",t$dir]
+move=function(t,d){
+  x=t$x+coor["x",d]
+  y=t$y+coor["y",d]
   return(xy.coords(x,y))
 }
 
 #Déplacement du corps
-#entree : objet corps, objet tete
-#sortie : objet corps
-moveCorps=function(corps, tete){
-  vecCorps=names(corps)
+#entree : liste position
+#sortie : liste position
+moveCorps=function(lp){
+  vecCorps=names(lp)
   invCorps=rev(vecCorps)
   l=length(invCorps)
   for(i in 1:(l-1)){
     # print(paste("Voilà ce que je prend : ", invCorps[i]))
     # print(paste("ce que je met : ", invCorps[i+1]))
-    corps[[ invCorps[i] ]] = corps[[ invCorps[i+1] ]]
+    lp[[ invCorps[i] ]] = lp[[ invCorps[i+1] ]]
   }
-  corps[[ vecCorps[1] ]]=tete$coord
-  return(corps)
+  return(lp)
 }
 
 #test si la tete entre en colision avec le corps
-#entree : tete corps
+#entree : liste position
 #sortie : booléen
-testCollision=function(tete, corps){
-  for(i in corps){
-    if(i$x==tete$coord$x){
-      if(i$y==tete$coord$y){
+testCollision=function(lp){
+  
+  for(i in seq(1 , length(lp)-1) ) {
+    if(lp[[as.character(i)]]$x==lp[["0"]]$x){
+      if(lp[[as.character(i)]]$y==lp[["0"]]$y){
         return(T)
       }
     }
   }
   return(F)
+}
+
+#creer un objet snake avec un corps de taille n
+#entree : chiffre
+#sortie : objet snake
+initSnake=function(n){
+  listElem=list()
+  for(i in seq(0,n)){
+    listElem[[as.character(i)]]=xy.coords(-i,0)
+  }
+  return(listElem)
 }
 
 #--------------------------------------------------------------------------------------------------
@@ -106,39 +107,50 @@ coor=matrix(c(0,-1,0,1,
             nrow=2,
             dimnames = list(c("x","y"), dirVect))
 
-#entité tete
-tete=initTete()
-corps=list(A=xy.coords(-1,0), 
-           B=xy.coords(-2,0),
-           C=xy.coords(-3,0))
-
+#entité
+lp=initSnake(5)
+d="d"
+initGrille()
 #--------------------------------------------------------------------------------------------------
 #Main
 #--------------------------------------------------------------------------------------------------
 
 #boucle de test mv
-
-tete=initTete()
-corps=list(A=xy.coords(-1,0), 
-           B=xy.coords(-2,0),
-           C=xy.coords(-3,0),
-           D=xy.coords(-4,0))
-initGrille()
-while ((! testMur(tete)) & (! testCollision(tete, corps))){
-  #position du corps au prochain tour
-  corps=moveCorps(corps, tete)
-  #bouger
-  tete$coord=move(tete)
-  #afficher point
-  points(tete$coord)
-  #afficher corps
-  for(i in corps){
-    points(i, col='red')
+main=function(){
+  while ( (! testMur(lp[['0']]) ) & (! testCollision(lp) ) ){
+    
+    ##MOUVEMENT
+    #snake entier
+    lp=moveCorps(lp)
+    #tete
+    lp[['0']]=move(lp[['0']],d)
+    
+    ##TEST CROQUE POMME
+    
+    
+    ##AFFICHAGE
+    for(i in names(lp)){
+      #tete noire
+      if(i=='0'){
+        points(lp[[i]], col='black')
+      }
+      #corps rouge
+      else{
+        points(lp[[i]], col='red')
+      }
+    }
+    #pomme
+    
+    ##DIRECTION
+    #choisir direction
+    nouvelleDir=sample(dirVect,1)
+    #tester direction
+    d=testDir(d,nouvelleDir)
+    
+    #animation
+    Sys.sleep(0.3)
+    initGrille()
   }
-  #choisir direction
-  nouvelleDir=sample(dirVect,1)
-  #tester direction
-  tete$dir=testDir(tete$dir,nouvelleDir)
-  Sys.sleep(0.3)
-  initGrille()
 }
+
+main()
