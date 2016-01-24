@@ -3,13 +3,16 @@
 #--------------------------------------------------------------------------------------------------
 
 #cree un nouveau plot
-#entree : -
+#entree : position des pommes
 #sortie : -
-initGrille=function(){
+initGrille=function(pomme){
   plot(42,xlim=c(-10,10),ylim=c(-10,10))
   
   abline(v=(seq(-10,10,1)), col="lightgray", lty="dotted")
   abline(h=(seq(-10,10,1)), col="lightgray", lty="dotted")
+  
+  #Premières pommes
+  points(pomme[,1],pomme[,2],col="green",pch=20,cex = 2)
 }
 
 #test si la position actuelle est sur ou en dehors des bords
@@ -108,15 +111,25 @@ coor=matrix(c(0,-1,0,1,
             dimnames = list(c("x","y"), dirVect))
 
 #entité
-lp=initSnake(5)
-d="d"
-initGrille()
+#lp=initSnake(5) Mis dans le main
+#d="d" Mis dans le main
+#¶initGrille() Mis dans AFFICHAGE du main
 #--------------------------------------------------------------------------------------------------
 #Main
 #--------------------------------------------------------------------------------------------------
 
 #boucle de test mv
-main=function(){
+main=function(nb_pomme = 6){
+  lp=initSnake(5)
+  d="d"
+  
+  ## PREMIERES POMMES
+  pomme = matrix(0,nb_pomme,2)
+  for(i in 1:nrow(pomme)){
+    pomme[i,1] = sample(-10:10,1)
+    pomme[i,2] = sample(-10:10,1)
+  }
+  
   while ( (! testMur(lp[['0']]) ) & (! testCollision(lp) ) ){
     
     ##MOUVEMENT
@@ -129,6 +142,7 @@ main=function(){
     
     
     ##AFFICHAGE
+    initGrille(pomme) #Grille avec les pommes
     for(i in names(lp)){
       #tete noire
       if(i=='0'){
