@@ -25,7 +25,7 @@ testMur=function(t){
   return(F)
 }
 
-#test si la direction demandé est possible et rend la 
+#test si la direction demandé est possible et la rend
 #entree : caractere, caractere
 #sortie : caractere
 testDir=function(depart, demande){
@@ -85,6 +85,19 @@ initSnake=function(n){
   return(listElem)
 }
 
+#rend une ligne csv du jeu
+#entree : liste position, position
+#sortie : string
+gameToString = function(lp,d,p){
+  line=''
+  line=paste(d,p$x,p$y,sep="," )
+  for (i in lp) {
+    line=paste(line,i$x,i$y,sep=",")
+  }
+  line=paste(line)
+  return(line)
+}
+
 #--------------------------------------------------------------------------------------------------
 #Initialisation
 #--------------------------------------------------------------------------------------------------
@@ -139,7 +152,13 @@ main=function(nb_pomme = 6){
     lp[['0']]=move(lp[['0']],d)
     
     ##TEST CROQUE POMME
+    if (sample(c(T,F),1,prob=c(0.2,0.8))){
+      lp[[as.character(length(lp))]]=queue
+    }
     
+    ##SAUVEGARDE ETAT
+    
+    print(gameToString(lp,d,xy.coords(42,42)))
     
     ##AFFICHAGE
     initGrille(pomme) #Grille avec les pommes
