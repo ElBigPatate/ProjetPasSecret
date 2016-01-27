@@ -128,18 +128,14 @@ coor=matrix(c(0,-1,0,1,
             nrow=2,
             dimnames = list(c("x","y"), dirVect))
 
-#entité
-lp_snake=initSnake(3)
-lp_pomme=initPomme(1)
-d="d" 
-initGrille()
+
 #--------------------------------------------------------------------------------------------------
 #Main
 #--------------------------------------------------------------------------------------------------
 
 #boucle de test mv
 main=function(){
-  while ( (! testMur(lp_snake[['0']]) ) & (! testCollision(lp_snake) ) ){
+  while ( (! testMur(lp_snake[['0']]) ) & (! testCollision(lp_snake[-1],lp_snake[['0']]) ) ){
     ##DIRECTION
     #choisir direction
     nouvelleDir = sample(dirVect,1)
@@ -156,27 +152,28 @@ main=function(){
     
     
     ##TEST CROQUE POMME
-    if (sample(c(T,F),1,prob=c(0.2,0.8))){
+    if ( testCollision(lp_pomme,lp_snake[['0']])){
+      #allongement
       lp_snake[[as.character(length(lp_snake))]]=queue
+      #nouvelle pomme
+      lp_pomme=initPomme(1)
     }
     
     ##SAUVEGARDE ETAT
     
-    print(gameToString(lp_snake,d,xy.coords(42,42)))
+    print(gameToString(lp_snake,d,lp_pomme[[1]]))
     
     ##AFFICHAGE
-    for (i in names(lp_snake)) {
-      #tete noire
-      if (i == '0') {
-        points(lp_snake[[i]], col = 'black')
-      }
-      #corps rouge
-      else{
-        points(lp_snake[[i]], col = 'red')
-      }
+    #tete
+    points(lp_snake[["0"]],col='black')
+    #corps
+    for(i in lp_snake[-1]){
+      points(i,col='red')
     }
-    points(queue,col='green')
     #pomme
+    for (i in lp_pomme){
+      points(i,col='green',pch=16)
+    }
     
     #animation
     Sys.sleep(0.3)
@@ -184,5 +181,60 @@ main=function(){
   }
 }
 
+#boucle de test mv
+test_no_aff=function(){
+  lp_snake=initSnake(3)
+  lp_pomme=initPomme(1)
+  d="d" 
+  result=T
+  while ( (! testMur(lp_snake[['0']]) ) & (! testCollision(lp_snake[-1],lp_snake[['0']]) ) ){
+    ##DIRECTION
+    #choisir direction
+    nouvelleDir = sample(dirVect,1)
+    #tester direction
+    d = testDir(d,nouvelleDir)
+    
+    ##MOUVEMENT
+    queue=lp_snake[[as.character(length(lp_snake)-1)]]
+    #snake entier
+    lp_snake = moveCorps(lp_snake)
+    #tete
+    lp_snake[['0']] = move(lp_snake[['0']],d)
+    #allongement si pomme
+    
+    ##TEST CROQUE POMME
+    if ( testCollision(lp_pomme,lp_snake[['0']])){
+      #allongement
+      lp_snake[[as.character(length(lp_snake))]]=queue
+      #nouvelle pomme
+      lp_pomme=initPomme(1)
+      result=F
+    }
+    
+  }
+  return(result)
+}
+
+#--------------------------------------------------------------------------------------------------
+#Test
+#--------------------------------------------------------------------------------------------------
+
+#entité
+lp_snake=initSnake(3)
+lp_pomme=initPomme(1)
+d="d" 
+initGrille()
+#lancement
 main()
 
+vec_res=c()
+for(i in 0:10000){
+  print(i)
+  bool=T
+  cpt=0
+  while(bool){
+    bool=test_no_aff()
+    cpt=1+cpt
+  }
+  vec_res=c(vec_res,cpt)
+}
