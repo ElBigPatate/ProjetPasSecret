@@ -5,14 +5,11 @@
 #cree un nouveau plot
 #entree : position des pommes
 #sortie : -
-initGrille=function(pomme){
+initGrille=function(){
   plot(42,xlim=c(-10,10),ylim=c(-10,10))
   
   abline(v=(seq(-10,10,1)), col="lightgray", lty="dotted")
   abline(h=(seq(-10,10,1)), col="lightgray", lty="dotted")
-  
-  #Premières pommes
-  points(pomme[,1],pomme[,2],col="green",pch=20,cex = 2)
 }
 
 #test si la position actuelle est sur ou en dehors des bords
@@ -59,16 +56,13 @@ moveCorps=function(lp){
   return(lp)
 }
 
-#test si la tete entre en colision avec le corps
-#entree : liste position
+#test si une position entre en collision avec une liste de position
+#entree : liste position, position
 #sortie : booléen
-testCollision=function(lp){
-  
-  for(i in seq(1 , length(lp)-1) ) {
-    if(lp[[as.character(i)]]$x==lp[["0"]]$x){
-      if(lp[[as.character(i)]]$y==lp[["0"]]$y){
-        return(T)
-      }
+testCollision=function(lp,p){
+  for(i in lp) {
+    if(i$x==p$x && i$y==p$y){
+      return(T)
     }
   }
   return(F)
@@ -81,6 +75,17 @@ initSnake=function(n){
   listElem=list()
   for(i in seq(0,n)){
     listElem[[as.character(i)]]=xy.coords(-i,0)
+  }
+  return(listElem)
+}
+
+#rempli une liste de pomme aléatoirement
+#entree : chiffre
+#sortie : liste position
+initPomme=function(n){
+  listElem=list()
+  for(i in 1:n){
+    listElem[[as.character(i)]]=xy.coords(sample(-10:10,1),sample(-10:10,1))
   }
   return(listElem)
 }
@@ -124,61 +129,54 @@ coor=matrix(c(0,-1,0,1,
             dimnames = list(c("x","y"), dirVect))
 
 #entité
-#lp=initSnake(5) Mis dans le main
-#d="d" Mis dans le main
-#¶initGrille() Mis dans AFFICHAGE du main
+lp_snake=initSnake(3)
+lp_pomme=initPomme(1)
+d="d" 
+initGrille()
 #--------------------------------------------------------------------------------------------------
 #Main
 #--------------------------------------------------------------------------------------------------
 
 #boucle de test mv
-main=function(nb_pomme = 6){
-  lp=initSnake(5)
-  d="d"
-  
-  ## PREMIERES POMMES
-  pomme = matrix(0,nb_pomme,2)
-  for(i in 1:nrow(pomme)){
-    pomme[i,1] = sample(-10:10,1)
-    pomme[i,2] = sample(-10:10,1)
-  }
-  
-  while ( (! testMur(lp[['0']]) ) & (! testCollision(lp) ) ){
+main=function(){
+  while ( (! testMur(lp_snake[['0']]) ) & (! testCollision(lp_snake) ) ){
+    ##DIRECTION
+    #choisir direction
+    nouvelleDir = sample(dirVect,1)
+    #tester direction
+    d = testDir(d,nouvelleDir)
     
     ##MOUVEMENT
+    queue=lp_snake[[as.character(length(lp_snake)-1)]]
     #snake entier
-    lp=moveCorps(lp)
+    lp_snake = moveCorps(lp_snake)
     #tete
-    lp[['0']]=move(lp[['0']],d)
+    lp_snake[['0']] = move(lp_snake[['0']],d)
+    #allongement si pomme
+    
     
     ##TEST CROQUE POMME
     if (sample(c(T,F),1,prob=c(0.2,0.8))){
-      lp[[as.character(length(lp))]]=queue
+      lp_snake[[as.character(length(lp_snake))]]=queue
     }
     
     ##SAUVEGARDE ETAT
     
-    print(gameToString(lp,d,xy.coords(42,42)))
+    print(gameToString(lp_snake,d,xy.coords(42,42)))
     
     ##AFFICHAGE
-    initGrille(pomme) #Grille avec les pommes
-    for(i in names(lp)){
+    for (i in names(lp_snake)) {
       #tete noire
-      if(i=='0'){
-        points(lp[[i]], col='black')
+      if (i == '0') {
+        points(lp_snake[[i]], col = 'black')
       }
       #corps rouge
       else{
-        points(lp[[i]], col='red')
+        points(lp_snake[[i]], col = 'red')
       }
     }
+    points(queue,col='green')
     #pomme
-    
-    ##DIRECTION
-    #choisir direction
-    nouvelleDir=sample(dirVect,1)
-    #tester direction
-    d=testDir(d,nouvelleDir)
     
     #animation
     Sys.sleep(0.3)
@@ -187,3 +185,4 @@ main=function(nb_pomme = 6){
 }
 
 main()
+
