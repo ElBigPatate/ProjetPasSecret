@@ -165,16 +165,11 @@ main=function(){
     
     ##AFFICHAGE
     #tete
-    points(lp_snake[["0"]],col='black')
+    points(lp_snake[["0"]],col='black', pch=19, lwd=3)
     #corps
-    for(i in lp_snake[-1]){
-      points(i,col='red')
-    }
+    lapply(lp_snake[-1], points, col='red', pch=19, lwd=2)
     #pomme
-    for (i in lp_pomme){
-      points(i,col='green',pch=16)
-    }
-    
+    lapply(lp_pomme, points, col='green', pch=19, lwd=2)
     #animation
     Sys.sleep(0.3)
     initGrille()
