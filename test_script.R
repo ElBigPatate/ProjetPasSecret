@@ -134,7 +134,7 @@ coor=matrix(c(0,-1,0,1,
 #--------------------------------------------------------------------------------------------------
 
 #boucle de test mv
-main=function(){
+main=function(affiche=T){
   while ( (! testMur(lp_snake[['0']]) ) & (! testCollision(lp_snake[-1],lp_snake[['0']]) ) ){
     ##DIRECTION
     #choisir direction
@@ -159,20 +159,22 @@ main=function(){
       lp_pomme=initPomme(1)
     }
     
-    ##SAUVEGARDE ETAT
-    
-    print(gameToString(lp_snake,d,lp_pomme[[1]]))
-    
-    ##AFFICHAGE
-    #tete
-    points(lp_snake[["0"]],col='black', pch=19, lwd=3)
-    #corps
-    lapply(lp_snake[-1], points, col='red', pch=19, lwd=2)
-    #pomme
-    lapply(lp_pomme, points, col='green', pch=19, lwd=2)
-    #animation
-    Sys.sleep(0.3)
-    initGrille()
+    if (affiche){
+      ##SAUVEGARDE ETAT
+      
+      print(gameToString(lp_snake,d,lp_pomme[[1]]))
+      
+      ##AFFICHAGE
+      #tete
+      points(lp_snake[["0"]],col='black', pch=19, lwd=3)
+      #corps
+      lapply(lp_snake[-1], points, col='red', pch=19, lwd=2)
+      #pomme
+      lapply(lp_pomme, points, col='green', pch=19, lwd=2)
+      #animation
+      Sys.sleep(0.3)
+      initGrille()
+    }
   }
 }
 
